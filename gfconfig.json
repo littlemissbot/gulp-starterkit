@@ -1,0 +1,43 @@
+{
+    "version": "1.0.0",
+    "styles": [
+        "src/assets/styles/application.css",
+        "src/assets/styles/main.css"
+    ],
+    "scripts": [
+        "src/assets/scripts/main.js"
+    ],
+    "images": [
+        "src/assets/images/**/*.png",
+        "src/assets/images/**/*.jpg",
+        "src/assets/images/**/*.jpeg",
+        "src/assets/images/**/*.gif",
+        "src/assets/images/**/*.svg"
+    ],
+    "fonts": "src/assets/fonts",
+    "sass": "src/assets/sass/**/*.scss",
+    "nunjucks": "src/app/pages/**/*.htm",
+    "nunjuck_templates": "src/app/partials",
+
+
+    "data": "./src/data/sample1.json",
+
+
+    "dest": {
+        "html": "dist",
+        "styles": "dist/css",
+        "scripts": "dist/js",
+        "images": "dist/img",
+        "fonts": "dist/fonts",
+        "sass": "src/assets/styles/"
+    },
+
+
+    "git_deploy": {
+        "html": "docs",
+        "styles": "docs/css",
+        "scripts": "docs/js",
+        "images": "docs/img",
+        "fonts": "docs/fonts"
+    }
+}
