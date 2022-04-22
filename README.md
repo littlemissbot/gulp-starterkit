@@ -1,5 +1,5 @@
-# Gulp Automation v3 ![GitHub followers](https://img.shields.io/github/followers/connect2samita.svg?style=social)
-Automate and Enhance development environment using Gulp v3. 
+# Gulp Automation ![GitHub followers](https://img.shields.io/github/followers/connect2samita.svg?style=social)
+Automate and Enhance development environment using Gulp. 
 
 ![npm](https://img.shields.io/npm/v/gulp.svg?color=green) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/connect2samita/gulp-automation-v3.svg?color=green) ![GitHub All Releases](https://img.shields.io/github/downloads/connect2samita/gulp-automation-v3/total.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/connect2samita/gulp-automation-v3.svg) ![GitHub](https://img.shields.io/github/license/connect2samita/gulp-automation-v3.svg)
 
@@ -8,31 +8,34 @@ Automate and Enhance development environment using Gulp v3.
 NodeJS - refer https://nodejs.org/en/ to install.
 ```
 $ node --version
-v10.15.3
+v14.15.1
 ```
 NPM is a distribution of NodeJS, no separate installation required.
 ```
 $ npm --version
-6.9.0
+7.5.4
 ```
-Gulp CLI
-npm -g install gulp-cli
+Gulp CLI - refer https://gulpjs.com/docs/en/getting-started/quick-start to install
+```
+$ gulp --version
+CLI version: 2.3.0
+Local version: 4.0.2
+```
 ###### NPM Packages Used
 NPM package dependencies for development environment automation and enhancements.
 
 ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/connect2samita/gulp-automation-v3/gulp.svg) ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/connect2samita/gulp-automation-v3/gulp-sass.svg) ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/connect2samita/gulp-automation-v3/gulp-nunjucks-render.svg) ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/connect2samita/gulp-automation-v3/browser-sync.svg) 
 ```
 "dependencies": {
-    "browser-sync": "^2.26.3"
-    "gulp": "^3.9.0"
+    "browser-sync": "^2.27.9"
+    "gulp": "^4.0.2"
     "gulp-concat": "^2.6.1"
     "gulp-data": "^1.3.1"
     "gulp-nunjucks-render": "^2.2.3"
     "gulp-rename": "^1.4.0"
-    "gulp-sass": "^4.0.2"
+    "gulp-sass": "^5.1.0"
     "gulp-uglify": "^3.0.2"
-    "gulp-util": "^3.0.8"
-    "run-sequence": "^2.2.1"
+    "gulp-util": "^1.0.0"
  }
 ```
 
@@ -87,19 +90,19 @@ Edit file to customise and design your own folder structure.
 ###### Gulpfile Tasks Definations - gulpfile.js
 Edit file to update any gulp tasks to suit your needs
 ```
+/* file: gulpfile.js */
+
 // include gulp
-var gulp = require('gulp'),
-    gutil = require('gulp-util');
+const { watch, series, parallel, src, dest } = require('gulp');
 
 // include server plugins
 var browserSync = require('browser-sync').create();
-var runSequence = require('run-sequence');
 
 // include preprocessing plugins
 var sass = require('gulp-sass'),
-    concat = require('gulp-concat'),
-    rename = require('gulp-rename'),
-    uglify = require('gulp-uglify');
+    concat = require('gulp-concat');
+    // rename = require('gulp-rename'),
+    // uglify = require('gulp-uglify');
 
 // include templating plugins
 var nunjucksRender = require('gulp-nunjucks-render'),
@@ -111,100 +114,104 @@ var fetchConfig = fs.readFileSync("gfconfig.json", "utf8")
 const config = JSON.parse(fetchConfig);
 
 // create a start task and log a message
-gulp.task('init', function() {
-    gutil.log('Initiating Gulp!');
-});
+function init(cb) {
+    console.log("Initiating Gulp!");
+    cb();
+}
 
 // compiling sass files
-gulp.task('sass-compile', function() {
-    gutil.log('Compiling SASS Files!');
-    return gulp.src(config.sass)
+function sassCompile() {
+    console.log("Compiling SASS Files!");
+    return src(config.sass)
 		.pipe(sass())
-		.pipe(gulp.dest(config.dest.sass));
-});
+		.pipe(dest(config.dest.sass));
+}
 
 // compiling css files
-gulp.task('css-compile', function() {
-    gutil.log('Compiling CSS Files!');
-    return gulp.src(config.styles)
-        .pipe(concat('application.css'))
-        .pipe(gulp.dest(config.dest.styles));
-});
+function cssCompile() {
+    console.log("Compiling CSS Files!");
+    return src(config.styles)
+		.pipe(concat('application.css'))
+		.pipe(dest(config.dest.styles));
+}
 
 // compiling js files
-gulp.task('js-compile', function() {
-    gutil.log('Compiling JS Files!');
-    return gulp.src(config.scripts)
-        .pipe(concat('application.js'))
-        .pipe(gulp.dest(config.dest.scripts));
-});
+function jsCompile() {
+    console.log("Compiling JS Files!");
+    return src(config.scripts)
+		.pipe(concat('application.js'))
+		.pipe(dest(config.dest.scripts));
+}
 
 // compiling nunjuck template files
-gulp.task('html-compile', function() {
-    gutil.log('Compiling HTML Template Files!');
-    return gulp.src(config.nunjucks)
-    .pipe(data(function() {
-        return require(config.data)
-      }))
-    .pipe(nunjucksRender({
-        path: [config.nunjuck_templates]
-      }))
-    .pipe(gulp.dest(config.dest.html))
-});
+function htmlCompile() {
+    console.log("Compiling HTML Template Files!");
+    return src(config.nunjucks)
+        .pipe(data(function() {
+            return require(config.data)
+        }))
+        .pipe(nunjucksRender({
+            path: [config.nunjuck_templates]
+        }))
+		.pipe(dest(config.dest.html));
+}
 
-// TODO: optimize css and js files
-gulp.task('optimization', function() {
-    gutil.log('Optimizing APP Files!');
-})
+// optimize css and js files
+function optimization(cb) {
+    console.log("Optimizing APP Files!");
+    cb();
+}
 
 // creating a server
-gulp.task('init-server', function() {
-    gutil.log('Starting Browser Sync!');
+function initServer() {
+    console.log("Starting Browser Sync!");
     browserSync.init({
         server: config.dest.html
     });
-});
+}
 
 // updating server files
-gulp.task('reload-server', function() {
-    // watch for website content updates
-    gulp.watch(`${config.dest.html}/*.html`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.styles}/*.css`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.scripts}/*.js`).on('change', browserSync.reload);
-
-    // watch for image asset updates
-    gulp.watch(`${config.dest.images}/*.jpg`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.images}/*.jpeg`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.images}/*.png`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.images}/*.gif`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.images}/*.svg`).on('change', browserSync.reload);
-});
+function reloadServer(cb) {
+    browserSync.reload();
+    cb();
+}
 
 // compile source files
-gulp.task('compile-src', function() {
-    runSequence(['sass-compile', 'css-compile', 'js-compile', 'html-compile']);
-});
+function compileSrc(cb) {
+    series(sassCompile, cssCompile, jsCompile, htmlCompile);
+    cb();
+};
 
 // recompile source files
-gulp.task('recompile-src', function() {
+function recompileSrc() {
     // watch for website content updates
-    gulp.watch(config.sass, ['sass-compile']);
-    gulp.watch(config.styles, ['css-compile']);
-    gulp.watch(config.scripts, ['js-compile']);
-    gulp.watch(config.nunjucks, ['html-compile']);
-    gulp.watch(`${config.nunjuck_templates}/**/*.htm`, ['html-compile']);
-});
+    watch(`${config.dest.html}/*.html`, reloadServer)
+    watch(`${config.dest.html}/*.css`, reloadServer)
+    watch(`${config.dest.html}/*.js`, reloadServer)
+
+    // watch for image asset updates
+    watch(`${config.dest.images}/*.jpg`, reloadServer);
+    watch(`${config.dest.images}/*.jpeg`, reloadServer);
+    watch(`${config.dest.images}/*.png`, reloadServer);
+    watch(`${config.dest.images}/*.gif`, reloadServer);
+    watch(`${config.dest.images}/*.svg`, reloadServer);
+
+    // watch for website raw content updates
+    watch(config.sass, series(sassCompile, reloadServer));
+    watch(config.styles, series(cssCompile, reloadServer));
+    watch(config.scripts, series(jsCompile, reloadServer));
+    watch(config.nunjucks, series(htmlCompile, reloadServer));
+    watch(`${config.nunjuck_templates}/**/*.htm`, series(htmlCompile, reloadServer));
+}
 
 // ===========================
 // gulp serve (for development)
-gulp.task('serve', function() {
-    runSequence(['init', 'compile-src', 'init-server', 'reload-server', 'recompile-src']);
-});
+exports.serve = series(init, compileSrc, optimization, parallel(initServer, recompileSrc))
 
 // gulp build (for production)
-gulp.task('build', function() {
-    runSequence(['init', 'compile-src', 'optimization']);
-});
+exports.build = series(init, series(sassCompile, cssCompile, jsCompile, htmlCompile), optimization)
+
+exports.default = series(init, series(sassCompile, cssCompile, jsCompile, htmlCompile), optimization)
 ```
 
 ### Coming Soon
