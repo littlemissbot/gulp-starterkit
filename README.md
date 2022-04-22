@@ -1,4 +1,4 @@
-# Gulp Automation ![GitHub followers](https://img.shields.io/github/followers/connect2samita.svg?style=social)
+# Gulp Automation ![GitHub followers](https://img.shields.io/github/followers/littlemissbot.svg?style=social)
 Automate and Enhance development environment using Gulp. 
 
 ![npm](https://img.shields.io/npm/v/gulp.svg?color=green) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/connect2samita/gulp-automation-v3.svg?color=green) ![GitHub All Releases](https://img.shields.io/github/downloads/connect2samita/gulp-automation-v3/total.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/connect2samita/gulp-automation-v3.svg) ![GitHub](https://img.shields.io/github/license/connect2samita/gulp-automation-v3.svg)
