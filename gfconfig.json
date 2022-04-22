@@ -22,7 +22,6 @@
 
     "data": "./src/data/sample1.json",
 
-
     "dest": {
         "html": "dist",
         "styles": "dist/css",
@@ -38,6 +37,7 @@
         "styles": "docs/css",
         "scripts": "docs/js",
         "images": "docs/img",
-        "fonts": "docs/fonts"
+        "fonts": "docs/fonts",
+        "sass": "src/assets/styles/"
     }
 }

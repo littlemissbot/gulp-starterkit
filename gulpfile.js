@@ -1,18 +1,16 @@
 /* file: gulpfile.js */
 
 // include gulp
-var gulp = require('gulp'),
-    gutil = require('gulp-util');
+const { watch, series, parallel, src, dest } = require('gulp');
 
 // include server plugins
 var browserSync = require('browser-sync').create();
-var runSequence = require('run-sequence');
 
 // include preprocessing plugins
 var sass = require('gulp-sass'),
-    concat = require('gulp-concat'),
-    rename = require('gulp-rename'),
-    uglify = require('gulp-uglify');
+    concat = require('gulp-concat');
+    // rename = require('gulp-rename'),
+    // uglify = require('gulp-uglify');
 
 // include templating plugins
 var nunjucksRender = require('gulp-nunjucks-render'),
@@ -24,97 +22,101 @@ var fetchConfig = fs.readFileSync("gfconfig.json", "utf8")
 const config = JSON.parse(fetchConfig);
 
 // create a start task and log a message
-gulp.task('init', function() {
-    gutil.log('Initiating Gulp!');
-});
+function init(cb) {
+    console.log("Initiating Gulp!");
+    cb();
+}
 
 // compiling sass files
-gulp.task('sass-compile', function() {
-    gutil.log('Compiling SASS Files!');
-    return gulp.src(config.sass)
+function sassCompile() {
+    console.log("Compiling SASS Files!");
+    return src(config.sass)
 		.pipe(sass())
-		.pipe(gulp.dest(config.dest.sass));
-});
+		.pipe(dest(config.dest.sass));
+}
 
 // compiling css files
-gulp.task('css-compile', function() {
-    gutil.log('Compiling CSS Files!');
-    return gulp.src(config.styles)
-        .pipe(concat('application.css'))
-        .pipe(gulp.dest(config.dest.styles));
-});
+function cssCompile() {
+    console.log("Compiling CSS Files!");
+    return src(config.styles)
+		.pipe(concat('application.css'))
+		.pipe(dest(config.dest.styles));
+}
 
 // compiling js files
-gulp.task('js-compile', function() {
-    gutil.log('Compiling JS Files!');
-    return gulp.src(config.scripts)
-        .pipe(concat('application.js'))
-        .pipe(gulp.dest(config.dest.scripts));
-});
+function jsCompile() {
+    console.log("Compiling JS Files!");
+    return src(config.scripts)
+		.pipe(concat('application.js'))
+		.pipe(dest(config.dest.scripts));
+}
 
 // compiling nunjuck template files
-gulp.task('html-compile', function() {
-    gutil.log('Compiling HTML Template Files!');
-    return gulp.src(config.nunjucks)
-    .pipe(data(function() {
-        return require(config.data)
-      }))
-    .pipe(nunjucksRender({
-        path: [config.nunjuck_templates]
-      }))
-    .pipe(gulp.dest(config.dest.html))
-});
+function htmlCompile() {
+    console.log("Compiling HTML Template Files!");
+    return src(config.nunjucks)
+        .pipe(data(function() {
+            return require(config.data)
+        }))
+        .pipe(nunjucksRender({
+            path: [config.nunjuck_templates]
+        }))
+		.pipe(dest(config.dest.html));
+}
 
 // optimize css and js files
-gulp.task('optimization', function() {
-    gutil.log('Optimizing APP Files!');
-})
+function optimization(cb) {
+    console.log("Optimizing APP Files!");
+    cb();
+}
 
 // creating a server
-gulp.task('init-server', function() {
-    gutil.log('Starting Browser Sync!');
+function initServer() {
+    console.log("Starting Browser Sync!");
     browserSync.init({
         server: config.dest.html
     });
-});
+}
 
 // updating server files
-gulp.task('reload-server', function() {
-    // watch for website content updates
-    gulp.watch(`${config.dest.html}/*.html`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.styles}/*.css`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.scripts}/*.js`).on('change', browserSync.reload);
-
-    // watch for image asset updates
-    gulp.watch(`${config.dest.images}/*.jpg`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.images}/*.jpeg`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.images}/*.png`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.images}/*.gif`).on('change', browserSync.reload);
-    gulp.watch(`${config.dest.images}/*.svg`).on('change', browserSync.reload);
-});
+function reloadServer(cb) {
+    browserSync.reload();
+    cb();
+}
 
 // compile source files
-gulp.task('compile-src', function() {
-    runSequence(['sass-compile', 'css-compile', 'js-compile', 'html-compile']);
-});
+function compileSrc(cb) {
+    series(sassCompile, cssCompile, jsCompile, htmlCompile);
+    cb();
+};
 
 // recompile source files
-gulp.task('recompile-src', function() {
+function recompileSrc() {
     // watch for website content updates
-    gulp.watch(config.sass, ['sass-compile']);
-    gulp.watch(config.styles, ['css-compile']);
-    gulp.watch(config.scripts, ['js-compile']);
-    gulp.watch(config.nunjucks, ['html-compile']);
-    gulp.watch(`${config.nunjuck_templates}/**/*.htm`, ['html-compile']);
-});
+    watch(`${config.dest.html}/*.html`, reloadServer)
+    watch(`${config.dest.html}/*.css`, reloadServer)
+    watch(`${config.dest.html}/*.js`, reloadServer)
+
+    // watch for image asset updates
+    watch(`${config.dest.images}/*.jpg`, reloadServer);
+    watch(`${config.dest.images}/*.jpeg`, reloadServer);
+    watch(`${config.dest.images}/*.png`, reloadServer);
+    watch(`${config.dest.images}/*.gif`, reloadServer);
+    watch(`${config.dest.images}/*.svg`, reloadServer);
+
+    // watch for website raw content updates
+    watch(config.sass, series(sassCompile, reloadServer));
+    watch(config.styles, series(cssCompile, reloadServer));
+    watch(config.scripts, series(jsCompile, reloadServer));
+    watch(config.nunjucks, series(htmlCompile, reloadServer));
+    watch(`${config.nunjuck_templates}/**/*.htm`, series(htmlCompile, reloadServer));
+}
 
 // ===========================
 // gulp serve (for development)
-gulp.task('serve', function() {
-    runSequence(['init', 'compile-src', 'init-server', 'reload-server', 'recompile-src']);
-});
+exports.serve = series(init, compileSrc, optimization, parallel(initServer, recompileSrc))
 
 // gulp build (for production)
-gulp.task('build', function() {
-    runSequence(['init', 'compile-src', 'optimization']);
-});
+exports.build = series(init, series(sassCompile, cssCompile, jsCompile, htmlCompile), optimization)
+
+exports.default = series(init, series(sassCompile, cssCompile, jsCompile, htmlCompile), optimization)

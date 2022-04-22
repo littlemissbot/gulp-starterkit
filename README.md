@@ -15,6 +15,8 @@ NPM is a distribution of NodeJS, no separate installation required.
 $ npm --version
 6.9.0
 ```
+Gulp CLI
+npm -g install gulp-cli
 ###### NPM Packages Used
 NPM package dependencies for development environment automation and enhancements.
 
