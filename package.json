@@ -1,5 +1,5 @@
 {
-  "name": "gulp-automation-v3",
+  "name": "gulp-starterkit",
   "version": "1.0.0",
   "description": "Automate and Enhance your development environment using Gulp v3",
   "main": "index.js",
